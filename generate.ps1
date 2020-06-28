@@ -24,12 +24,13 @@ echo "<html>"
 echo "<head>"
 echo "<link rel=`"stylesheet`" href=`"https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css`" integrity=`"sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk`" crossorigin=`"anonymous`">"
 echo "</head>"
-echo "<body>"
+echo "<body class=`"bg-info`">"
 echo "<div class=`"container text-center`">"
 
-$backgrounds = @("bg-primary", "bg-info", "bg-primary", "bg-info")
+$backgrounds = @("bg-dark text-white", "bg-secondary text-white")
 
 $skip = 0;
+$colSkipBase = 0;
 while ($true)
 {
   $rowBooks = $books | Select-Object -Skip $skip -First 4
@@ -38,49 +39,56 @@ while ($true)
     break
   }
 
-  echo "<div class=`"row pt-3`">"
+  $colSkip = $colSkipBase;
+  echo "<div class=`"row`">"
   foreach ($book in $rowBooks)
   {
-    echo "<div class=`"col-md-3`">"
+    $background = $backgrounds[$colSkip % 2]
+    $colSkip++
+    echo "<div class=`"col-md-3 pt-3 $background`">"
     echo "<img src=`"$($book.image_url)`" class=`"rounded mx-auto d-block`">"
     echo "</div>"
   }
   echo "</div>"
 
-  $colSkip = 0;
-  echo "<div class=`"row m-3`">"
+  $colSkip = $colSkipBase;
+  echo "<div class=`"row`">"
   foreach ($book in $rowBooks)
   {
-    $background = $backgrounds[$colSkip++]
-    echo "<div class=`"col-md-3 $background text-white`">"
+    $background = $backgrounds[$colSkip % 2]
+    $colSkip++
+    echo "<div class=`"col-md-3 $background`">"
     echo $book.title
     echo "</div>"
   }
   echo "</div>"
 
-  $colSkip = 0;
-  echo "<div class=`"row m-3`">"
+  $colSkip = $colSkipBase;
+  echo "<div class=`"row`">"
   foreach ($book in $rowBooks)
   {
-    $background = $backgrounds[$colSkip++]
-    echo "<div class=`"col-md-3 $background text-white`">"
+    $background = $backgrounds[$colSkip % 2]
+    $colSkip++
+    echo "<div class=`"col-md-3 $background`">"
     echo $book.authors.author.name
     echo "</div>"
   }
   echo "</div>"
   
-  $colSkip = 0;
-  echo "<div class=`"row m-3`">"
+  $colSkip = $colSkipBase;
+  echo "<div class=`"row`">"
   foreach ($book in $rowBooks)
   {
-    $background = $backgrounds[$colSkip++]
-    echo "<div class=`"col-md-3 $background text-white`">"
+    $background = $backgrounds[$colSkip % 2]
+    $colSkip++
+    echo "<div class=`"col-md-3 pb-2 $background`">"
     echo $book.num_pages
     echo "</div>"
   }
   echo "</div>"
 
   $skip += 4
+  $colSkipBase++
 }
 
 echo "</div>"
