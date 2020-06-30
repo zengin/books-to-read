@@ -1,6 +1,15 @@
 Param(
-  [string]$directory = "~"
+  [string]$directory = "~",
+  [switch]$lastYear  
 )
+
+$shelf = "to-read"
+if ($lastYear.IsPresent)
+{
+  $shelf = "read"
+}
+
+$year = (Get-Date).Year
 
 $goodreadsDeveloperKeyFile = Join-Path $directory "goodreadsDeveloperKey.txt"
 $goodreadsUserIdFile = Join-Path $directory "goodreadsUserId.txt"
@@ -14,11 +23,18 @@ If (!(Test-Path $goodreadsDeveloperKeyFile) -or !(Test-Path $goodreadsUserIdFile
 $developerKey = Get-Content $goodreadsDeveloperKeyFile
 $userId = Get-Content $goodreadsUserIdFile
 
-$url = "https://www.goodreads.com/review/list?v=2&key=$developerKey&shelf=to-read&per_page=200&id=$userId"
+$url = "https://www.goodreads.com/review/list?v=2&key=$developerKey&shelf=$shelf&per_page=200&id=$userId"
 
 $response = (Invoke-WebRequest $url)
-$xmlResponse = [xml]$response.Content 
-$books = $xmlResponse.GoodreadsResponse.reviews.review.book
+$xmlResponse = [xml]$response.Content
+$reviews = $xmlResponse.GoodreadsResponse.reviews.review
+
+if ($lastYear.IsPresent)
+{
+  $reviews = $reviews | Where-Object read_at -like "*$year"
+}
+
+$books = $reviews.book
 
 echo "<html>"
 echo "<head>"
